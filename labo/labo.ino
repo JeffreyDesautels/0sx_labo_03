@@ -25,6 +25,13 @@ bool start_done = false;
 int luminosity = 0;
 int last_luminosity = -1;
 
+int x_pin = A1;
+int y_pin = A2;
+int js_btn_pin = 2;
+int x_val = 0;
+int y_val = 0;
+int js_btn_state;
+
 
 void setup() {
   Serial.begin(115200);
@@ -35,15 +42,26 @@ void setup() {
   lcd.createChar(0, number);
 
   pinMode(LED_PIN, OUTPUT);
+  pinMode(x_pin, INPUT);
+  pinMode(y_pin, INPUT);
+  pinMode(js_btn_pin, INPUT_PULLUP);
 }
 
 void loop() {
   current_time = millis();
-  luminosity = analogRead(PHOTO_PIN);
-  int lum_percent = map(luminosity, 0, 1024, 0, 100);
 
-  start_task(current_time);
-  led_task(current_time, lum_percent);
+  luminosity = analogRead(PHOTO_PIN);
+  int lum_percent = map(luminosity, 0, 1023, 0, 100);
+
+  x_val = analogRead(x_pin);
+  int angle = map(x_val, 0, 1023, -90, 90);
+  y_val = analogRead(y_pin);
+  int speed = map(y_val, 0, 1023, -25, 120);
+  js_btn_state = digitalRead(js_btn_pin);
+
+  // start_task(current_time);
+  // led_task(current_time, lum_percent);
+  joystick_task(angle, speed, js_btn_state);
 }
 
 // en lancant les 2 fonctions ensemble, le texte de la premiere fonction ne reste pas affiche les 3 secondes necessaires
@@ -99,8 +117,33 @@ void led_task(unsigned long ct, int lp) {
   }
 }
 
-void joystick_task() {
-}
+void joystick_task(int angle, int speed, int js_btn_state) {
+  // Serial.print("Angle: ");
+  // Serial.print(angle);
+  // Serial.print("°");
+  // Serial.print(" | Speed: ");
+  // Serial.print(speed);
+  // Serial.print("KM/H");
+  // Serial.print(" | Button: ");
+  // Serial.println(js_btn_state);
 
-void button_task() {
+  // modifier valeurs par defaut
+  lcd.setCursor(0, 0);
+  if (speed >= 0) {
+    lcd.print("Avance ");
+  } else {
+    lcd.print("Recule ");
+  }
+  lcd.print(speed);
+  lcd.print("KMH/H ");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Direction: ");
+  if (angle >= 0) {
+    lcd.print("D");
+  } else {
+    lcd.print("G");
+  }
+
+  // reste a coder le changement d'affichage sur le lcd, peut etre utiliser nouvelle fonction expres pour
 }
