@@ -214,12 +214,12 @@ void console_output(unsigned long ct) {
   const long interval = 100;
 
   if (ct - previous_time >= interval) {
-    Serial.print("etd : 2255309 | ");
-    Serial.print("x : ");
+    Serial.print("etd:2255309,");
+    Serial.print("x:");
     Serial.print(x_val);
-    Serial.print(" | y : ");
+    Serial.print(",y:");
     Serial.print(y_val);
-    Serial.print(" sys : ");
+    Serial.print(",sys:");
     Serial.println(led_state);
 
     previous_time = ct;
