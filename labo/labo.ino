@@ -54,7 +54,7 @@ void loop() {
   int lum_percent = map(luminosity, 0, 1023, 0, 100);
 
   x_val = analogRead(X_PIN);
-  y_val = analogRead(Y_PIN);
+  y_val = (1023- analogRead(Y_PIN));
 
   is_clicked(current_time);
 
@@ -77,7 +77,7 @@ void start_task() {
   lcd.write(0);
   lcd.setCursor(14, 1);
   lcd.print("09");
-  delay(3000);
+  delay(interval);
   lcd.clear();
 }
 
@@ -142,18 +142,24 @@ void led_task(int lp) {
 void joystick_task(int x_val, int y_val) {
   int dead_point_x = 506;
   int angle;
-  int dead_point_y = 498;
+  const int max_angle = 90;
+  const int min_angle = -90;
+  const int straight = 0;
+  int dead_point_y = 525;
   int speed;
+  const int max_speed = 120;
+  const int min_speed = -25;
+  const int idle = 0;
 
   lcd.setCursor(0, 0);
   lcd.print("Vitesse: ");
   lcd.setCursor(9, 0);
   if (y_val >= (dead_point_y - 2) && y_val <= (dead_point_y + 2)) {
-    speed = 0;
+    speed = idle;
   } else if (y_val > dead_point_y) {
-    speed = map(y_val, dead_point_y, 1023, 0, 120);
+    speed = map(y_val, dead_point_y, 1023, idle, max_speed);
   } else {
-    speed = map(y_val, 0, dead_point_y, -25, 0);
+    speed = map(y_val, 0, dead_point_y, min_speed, idle);
   }
   lcd.print(speed);
   lcd.print("KM/H  ");
@@ -166,11 +172,11 @@ void joystick_task(int x_val, int y_val) {
     lcd.print(angle);
     lcd.print(" C    ");
   } else if (x_val > dead_point_x) {
-    angle = map(x_val, dead_point_x, 1023, 0, 90);
+    angle = map(x_val, dead_point_x, 1023, straight, max_angle);
     lcd.print(angle);
     lcd.print(" D    ");
   } else {
-    angle = map(x_val, 0, dead_point_x, -90, 0);
+    angle = map(x_val, 0, dead_point_x, min_angle, straight);
     lcd.print(angle);
     lcd.print(" G    ");
   }
